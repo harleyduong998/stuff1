@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hái Lộc Đầu Xuân - Chúc Mừng Năm Mới</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Background Patterns -->
+        <div class="background-overlay"></div>
+        <div class="particles" id="particles"></div>
+
+        <!-- Banner Scroll -->
+        <header class="banner-scroll">
+            <div class="scroll-rolls left"></div>
+            <div class="scroll-content">
+                <h1 class="calligraphy-title">Hái Lộc Đầu Xuân</h1>
+            </div>
+            <div class="scroll-rolls right"></div>
+            <div class="glow-dots"></div>
+        </header>
+
+        <!-- Red Envelopes Section -->
+        <main class="envelope-display">
+            <div class="envelope-stack">
+                <div class="envelope white-envelope left"></div>
+                <div class="envelope red-envelope main">
+                    <div class="envelope-flap"></div>
+                    <div class="envelope-decoration">
+                        <div class="gold-coin top"></div>
+                        <div class="knot-symbol"></div>
+                        <div class="gold-coin bottom"></div>
+                    </div>
+                </div>
+                <div class="envelope white-envelope right"></div>
+            </div>
+        </main>
+
+        <!-- Action Buttons -->
+        <footer class="action-footer">
+            <button class="btn-tet btn-create" id="btnCreate" onclick="location.href='/create'">
+                <span>TẠO LÌ XÌ</span>
+            </button>
+            <button class="btn-tet btn-receive" id="btnReceive">
+                <span>NHẬN LÌ XÌ</span>
+            </button>
+        </footer>
+    </div>
+
+    <script>
+        // Simple particle generator for glowing dots
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particle.style.opacity = Math.random();
+            particlesContainer.appendChild(particle);
+        }
+    </script>
+</body>
+
+</html>

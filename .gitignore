@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+env/
+venv/
+instance/
+.pytest_cache/
+.DS_Store
+*.swp
+node_modules/
+dist/
+build/
+.agent/
+brain/

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Lì Xì - Hái Lộc Đầu Xuân</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="create-page">
+    <div class="app-container">
+        <div class="background-overlay"></div>
+
+        <header class="header-minimal">
+            <button class="btn-back" onclick="location.href='/'">←</button>
+            <h2 class="page-title">Tạo Lì Xì</h2>
+        </header>
+
+        <main class="create-content">
+            <!-- QR Section -->
+            <section class="qr-section">
+                <div class="qr-container">
+                    <img src="{{ qr_code_url }}" alt="QR Code" class="qr-code">
+                    <div class="qr-scan-line"></div>
+                </div>
+                <p class="qr-hint">Mã QR để nhận lì xì</p>
+            </section>
+
+            <!-- Friends List Section -->
+            <section class="friends-section">
+                <h3 class="section-title">Chọn bạn bè tặng lì xì</h3>
+                <div class="friends-scroll-area">
+                    {% for friend in friends %}
+                    <div class="friend-card">
+                        <img src="{{ friend.avatar }}" alt="{{ friend.name }}" class="friend-avatar">
+                        <div class="friend-info">
+                            <span class="friend-name">{{ friend.name }}</span>
+                        </div>
+                        <button class="btn-wish" onclick="openModal('{{ friend.name }}')">
+                            Tạo lời chúc
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+
+        <!-- Wish Modal -->
+        <div id="wishModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h3>Viết lời chúc cho <span id="friendTarget"></span></h3>
+
+                <div class="wish-guide">
+                    <span class="guide-icon">💡</span>
+                    <span>Chọn các từ khóa phía dưới để tự động tạo lời chúc hay nhất!</span>
+                </div>
+
+                <textarea id="wishText" placeholder="Nhập lời chúc tốt đẹp nhất của bạn tại đây..."></textarea>
+
+                <div class="keyword-container" id="keywordContainer">
+                    <!-- Keywords will be injected by JS -->
+                </div>
+
+                <button class="btn-tet" onclick="saveWish()">
+                    <span>GỬI LÌ XÌ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const keywords = [
+            "sức khỏe", "học tập", "bình an", "may mắn", "thành công",
+            "phát tài", "vạn sự như ý", "an khang", "thịnh vượng",
+            "hạnh phúc", "tài lộc", "phú quý", "sung túc", "vinh hoa"
+        ];
+
+        let selectedKeywords = [];
+        let currentFriendName = "";
+
+        function initKeywords() {
+            const container = document.getElementById('keywordContainer');
+            container.innerHTML = '';
+            keywords.forEach(kw => {
+                const chip = document.createElement('div');
+                chip.className = 'keyword-chip';
+                chip.innerText = kw;
+                chip.onclick = () => toggleKeyword(kw, chip);
+                container.appendChild(chip);
+            });
+        }
+
+        function toggleKeyword(kw, element) {
+            const index = selectedKeywords.indexOf(kw);
+            if (index > -1) {
+                selectedKeywords.splice(index, 1);
+                element.classList.remove('active');
+            } else {
+                selectedKeywords.push(kw);
+                element.classList.add('active');
+            }
+            generateWish();
+        }
+
+        const keywordMap = {
+            "sức khỏe": "dồi dào sức khỏe, thân tâm an lạc",
+            "học tập": "học hành tấn tới, khoa bảng rạng danh",
+            "bình an": "vạn sự bình an, gia đạo êm ấm",
+            "may mắn": "vạn sự hanh thông, cát tường như ý",
+            "thành công": "công danh rạng rỡ, sự nghiệp thăng tiến",
+            "phát tài": "tài lộc đầy nhà, kinh doanh phát đạt",
+            "vạn sự như ý": "ý nguyện thành công, vạn điều như ý",
+            "an khang": "an khang thịnh vượng, phúc lộc dồi dào",
+            "thịnh vượng": "thịnh vượng an vui, giàu sang phú quý",
+            "hạnh phúc": "hạnh phúc đong đầy, tình duyên viên mãn",
+            "tài lộc": "tài lộc gõ cửa, tiền bạc rủng rỉnh",
+            "phú quý": "phú quý thọ khang, phát tài thịnh vượng",
+            "sung túc": "cuộc sống sung túc, ấm no đủ đầy",
+            "vinh hoa": "vinh hoa phú quý, hiển hách vẻ vang"
+        };
+
+        function generateWish() {
+            if (selectedKeywords.length === 0) {
+                document.getElementById('wishText').value = "";
+                return;
+            }
+
+            const intros = [
+                `Nhân dịp xuân về, chúc ${currentFriendName} `,
+                `Chúc mừng năm mới! Chúc ${currentFriendName} một năm `,
+                `Cung chúc tân xuân, chúc ${currentFriendName} luôn `,
+                `Năm mới Giáp Thìn, chúc ${currentFriendName} nhà mình `
+            ];
+
+            const intro = intros[Math.floor(Math.random() * intros.length)];
+            let wishParts = selectedKeywords.map(kw => keywordMap[kw] || kw);
+
+            let wish = intro;
+            if (wishParts.length === 1) {
+                wish += wishParts[0];
+            } else {
+                const main = wishParts.slice(0, -1).join(", ");
+                const last = wishParts[wishParts.length - 1];
+                wish += `${main} và ${last}`;
+            }
+            wish += ". Chúc một năm mới rực rỡ và trọn vẹn!";
+
+            document.getElementById('wishText').value = wish;
+        }
+
+        function openModal(name) {
+            currentFriendName = name;
+            document.getElementById('friendTarget').innerText = name;
+            document.getElementById('wishModal').style.display = 'flex';
+
+            // Reset modal state
+            selectedKeywords = [];
+            document.getElementById('wishText').value = "";
+            document.querySelectorAll('.keyword-chip').forEach(c => c.classList.remove('active'));
+        }
+
+        function closeModal() {
+            document.getElementById('wishModal').style.display = 'none';
+        }
+
+        function saveWish() {
+            const wish = document.getElementById('wishText').value;
+            if (wish.trim()) {
+                alert('Lời chúc đã được gửi đi thành công!');
+                closeModal();
+            } else {
+                alert('Vui lòng chọn từ khóa hoặc nhập lời chúc nhé!');
+            }
+        }
+
+        // Initialize keywords on load
+        window.onload = initKeywords;
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('wishModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+
+</html>
